@@ -1,0 +1,44 @@
+[Unit]
+Description=Gmail Bookmark Service - Automated email-to-bookmarking ingestion
+Documentation=https://github.com/your-org/gmail-bookmark-service
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gmail-service
+Group=gmail-service
+WorkingDirectory=/opt/gmail-bookmark-service
+Environment=PYTHONPATH=/opt/gmail-bookmark-service/src
+Environment=ENVIRONMENT=production
+Environment=JSON_LOGS=true
+EnvironmentFile=/opt/gmail-bookmark-service/.env
+
+# Main command
+ExecStart=/opt/gmail-bookmark-service/venv/bin/python -m gmail_bookmark_service.main
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/gmail-bookmark-service/data
+ReadWritePaths=/opt/gmail-bookmark-service/logs
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Restart settings
+Restart=always
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gmail-bookmark-service
+
+[Install]
+WantedBy=multi-user.target
